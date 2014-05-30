@@ -1,0 +1,122 @@
+<html>
+<head>
+<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
+<script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script type="text/javascript">
+google.load("visualization", '1', {packages:['corechart']});
+google.setOnLoadCallback(drawChart);
+function drawChart() {
+  var query = new google.visualization.Query(
+      'https://docs.google.com/spreadsheets/d/1I2hlIF58tgxd3dkZpPGRc8y4MHdlt77xxsOQ8Ntc730/edit#gid=0');
+
+  query.send(handleQueryResponse);
+}
+
+function handleQueryResponse(response) {
+  if (response.isError()) {
+    alert('Error in query: ' + response.getMessage() + ' ' + response.getDetailedMessage());
+    return;
+  }
+
+  data = response.getDataTable();
+  chart = new google.visualization.LineChart(document.getElementById('chart'));
+  chart.draw(data, {title: 'Spring 2014 Anime Hype Ladder', pointSize: 4, hAxis: {title: 'Week', format: '#', viewWindow: {min: 2}, gridlines: {count: 7}}, vAxis: {title: 'Hype Rating', gridlines: {count: 6}, viewWindow: {min: 5}}});
+  
+  // Add our selection handler.
+  google.visualization.events.addListener(chart, 'select', selectHandler);
+  
+  // add a generic click handler
+  google.visualization.events.addListener(chart, 'click', clickHandler);
+}
+
+function selectHandler() {
+  // see what got selected
+  var selection = chart.getSelection()[0];
+
+  // if selection is null then the event was actually a deselection
+  if (selection) {
+    // if selection.row is null then the entire column was selected
+    if (selection.row != null) {
+      value = data.getValue(selection.row, selection.column);
+      $('#myModalBody').empty();
+      $('#myModalLabel').text('Week ' + (selection.row+2) + ', Hype Rating ' + value + '/10');
+      text = details[value*2][selection.row]
+      if (text.indexOf('\n') > -1) {
+        pieces = text.split('\n');
+        for (var i = 0; i < pieces.length; i++) {
+          $('#myModalBody').append('<p>' + pieces[i] + '</p>');
+        }
+      }
+      else {
+        $('#myModalBody').text(details[value*2][selection.row]);
+      }
+      $('#myModal').modal();
+    }
+  }  
+}
+
+function clickHandler(e) {
+  if (e.targetID.indexOf('hAxis#0#label#') > -1) {
+    week = parseInt(e.targetID.split('hAxis#0#label#')[1]);
+    $('#myModalLabel').text('Week ' + (week+2));
+    $('#myModalBody').empty();
+    for(var i = details.length-1; i >= 0; i--) {
+      var text = details[i][week];
+      if (text) {
+        if (text.indexOf('\n') > -1) {
+          pieces = text.split('\n');
+          for (var j = 0; j < pieces.length; j++) {
+            $('#myModalBody').append('<p>' + pieces[j] + '</p>');
+          }
+        }
+        else {
+          $('#myModalBody').append('<p>' + text + '</p>');
+        }
+      }
+    }
+    $('#myModal').modal();
+  }
+}
+
+$( document ).ready(function() {
+  $('#myModal').on('hide.bs.modal', function (e) {
+    chart.setSelection();
+  });
+});
+
+function saveDetails(data) {
+  details = data;
+}
+</script>
+
+<title>Spring 2014 Anime Hype Ladder</title>
+</head>
+
+<body>
+<div style='height: 100%;' id='chart'></div>
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+      </div>
+      <div class="modal-body" id="myModalBody">
+        <p>something</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script async="" src="https://script.google.com/macros/s/AKfycbyMnakX4ThaSDJVz_KVet-v4LU-5amt0NgXFTMkvT4YmhBSosQ/exec?prefix=saveDetails"></script>
+
+</body>
+</html>
