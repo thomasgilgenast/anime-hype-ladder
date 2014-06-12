@@ -23,7 +23,7 @@ function handleQueryResponse(response) {
 
   data = response.getDataTable();
   chart = new google.visualization.LineChart(document.getElementById('chart'));
-  chart.draw(data, {title: 'Spring 2014 Anime Hype Ladder', pointSize: 4, hAxis: {title: 'Week', format: '#', viewWindow: {min: 2, max: 10}, gridlines: {count: 9}}, vAxis: {title: 'Hype Rating', gridlines: {count: 6}, viewWindow: {min: 5}}});
+  chart.draw(data, {title: 'Spring 2014 Anime Hype Ladder', pointSize: 4, hAxis: {title: 'Week', format: '#', viewWindow: {min: 2, max: data.getNumberOfRows() + 1}, gridlines: {count: data.getNumberOfRows()}}, vAxis: {title: 'Hype Rating', gridlines: {count: 6}, viewWindow: {min: 5}}});
   
   // Add our selection handler.
   google.visualization.events.addListener(chart, 'select', selectHandler);
