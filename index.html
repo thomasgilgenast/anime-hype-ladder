@@ -1,5 +1,6 @@
 <html>
 <head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
 <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
 <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
@@ -23,7 +24,7 @@ function handleQueryResponse(response) {
 
   data = response.getDataTable();
   chart = new google.visualization.LineChart(document.getElementById('chart'));
-  chart.draw(data, {title: 'Spring 2014 Anime Hype Ladder', pointSize: 4, hAxis: {title: 'Week', format: '#', viewWindow: {min: 2, max: 10}, gridlines: {count: 9}}, vAxis: {title: 'Hype Rating', gridlines: {count: 6}, viewWindow: {min: 5}}});
+  chart.draw(data, {title: 'Spring 2014 Anime Hype Ladder', pointSize: 4, hAxis: {title: 'Week', format: '#', viewWindow: {min: 2, max: data.getNumberOfRows() + 1}, gridlines: {count: data.getNumberOfRows()}}, vAxis: {title: 'Hype Rating', gridlines: {count: 6}, viewWindow: {min: 5}}});
   
   // Add our selection handler.
   google.visualization.events.addListener(chart, 'select', selectHandler);
@@ -96,7 +97,9 @@ function saveDetails(data) {
 </head>
 
 <body>
+<div class='container' style='height: 100%;'>
 <div style='height: 100%;' id='chart'></div>
+</div>
 
 <!-- Modal -->
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
